@@ -1,5 +1,12 @@
 import FPNode from "./utils/FPNode";
 
+/**
+ * Used to parse large swathes of sentence data and output
+ * a word tree using a recursive node algorithm.
+ * 
+ * This tree can be used to generate a number of phrases that appear
+ * frequently throughout the given data, modified by optionally provided params.
+ */
 class FrequentPhrase {
     registry?: { tree: string[] }
     rootNode: FPNode
@@ -8,7 +15,7 @@ class FrequentPhrase {
         this.rootNode = this.instantiateRootNode();
     }
 
-    instantiateRootNode(): FPNode {
+    private instantiateRootNode(): FPNode {
         if (false) {
             // some storage stuff, check for existing data
         } else {
@@ -27,6 +34,7 @@ class FrequentPhrase {
 
         for (const sentence of sentences) {
             this.rootNode.tree(sentence);
+            this.rootNode;
         }
     }
 }
