@@ -1,5 +1,5 @@
 {
-  "name": "typescript-npm-package-boilerplate",
+  "name": "frequent-phrases",
   "version": "0.2.0",
   "description": "TypeScript NPM Package Boilerplate",
   "main": "dist/index.js",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DZuz14/typescript-npm-package-boilerplate.git"
+    "url": "git+https://github.com/spokenaac/FrequentPhrases.git"
   },
   "keywords": [
     "boilerplate",
@@ -24,9 +24,9 @@
   "author": "Daniel Zuzevich",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DZuz14/typescript-npm-package-boilerplate/issues"
+    "url": "https://github.com/spokenaac/FrequentPhrases/issues"
   },
-  "homepage": "https://github.com/DZuz14/typescript-npm-package-boilerplate#readme",
+  "homepage": "https://github.com/spokenaac/FrequentPhrases#readme",
   "devDependencies": {
     "@types/jest": "^26.0.15",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
@@ -36,7 +36,7 @@
     "jest": "^26.6.0",
     "prettier": "^2.3.0",
     "ts-jest": "^26.4.1",
-    "typescript": "^4.0.3"
+    "typescript": "^4.5.4"
   },
   "files": [
     "dist/**/*"
