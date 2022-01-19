@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2022 SpokenAAC
+Copyright (c) 2013-present Pagar.me Pagamentos S/A
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
