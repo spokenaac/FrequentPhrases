@@ -1,4 +1,5 @@
-import { FPNodeProps } from './interfaces';
+import { FPNodeProps } from '../interfaces';
+import { removeTypedSentenceDuplicates, chunkSentences } from '../helpers';
 
 /**
  * Generic Node for creating the word tree hierarchies.
@@ -6,7 +7,7 @@ import { FPNodeProps } from './interfaces';
  */
 class FPNode {
     visits: number;
-    nodeWord: string
+    nodeWord: string;
     childNodes: FPNode[];
     parentNodes: FPNode[];
     childBranches: number;
@@ -60,15 +61,24 @@ class FPNode {
     }
 
     /**
-     * Prints all properties of the node.
+     * Returns all properties of the node.
+     * @param node FPNode
+     * @param withParents *boolean* with or without parents
      */
-    private getAllProps(node?: FPNode): void {
+    private getAllProps(node: FPNode, withParents: boolean): FPNodeProps {
         const curNode = node || this;
 
-        console.log('word: ', curNode.nodeWord);
-        console.log('visits: ', curNode.visits);
-        console.log('parents: ', curNode.parentNodes.filter((parent) => parent.nodeWord));
-        console.log('children: ', curNode.childNodes.filter((child) => `${child.nodeWord} + ${child.visits}`));
+        const props: FPNodeProps = {
+            visits: curNode.visits,
+            nodeWord: curNode.nodeWord,
+            childBranches: curNode.childBranches,
+            parentNodes: curNode.parentNodes.filter((parent) => parent.nodeWord),
+            childNodes: curNode.childNodes.filter((child) => `${child.nodeWord} + ${child.visits}`),
+        }
+
+        const { parentNodes, ...propsWithoutParents }: FPNodeProps = props
+
+        return withParents ? props : propsWithoutParents;
     }
 
     /**
@@ -89,52 +99,6 @@ class FPNode {
         }
 
         return props;
-    }
-
-    /**
-     * Process a a sentence into it's respective branches, modifying existing ones
-     * as necessary.
-     * @param body a sentence string.
-     */
-    public tree(sentence: string): void {
-        const words = sentence.split(' ');
-
-        let curNode: FPNode = this;
-
-        for (const word of words) {
-            curNode = curNode.addNewChildNode(word)
-            curNode.visits += 1
-        }
-    }
-
-    /**
-     * Display hierarchy starting with a Node of param word, at a given level.
-     * Default level is ROOT level.
-     * @param word 
-     * @param level 
-     */
-    public getNode(word: string, /* level = 0 */): void {
-        for (const child of this.childNodes) {
-            child.nodeWord === word && child.getAllProps()
-        }
-    }
-
-    /**
-     * Display hierarchy starting at the Root Node, spanning all branches to their endpoints.
-     * --WARNING: may throw recursion errors if you have large amounts of data!
-     * @param level 
-     */
-    public getHierarchy(level = 1): void {
-        level === 1 && console.log('***** ROOT LEVEL *****');
-
-        for (const child of this.childNodes) {
-            // console log nodes
-            level === 1 && console.log(`***** START BRANCH: ${child.nodeWord} *****\n`);
-            console.log('+' + '-'.repeat(level * 2 - 2), child.nodeWord, '( visits:', child.visits, ')');
-
-            // Recursive function call for all children
-            child.getHierarchy(level + 1);
-        }
     }
 
     /**
@@ -163,6 +127,72 @@ class FPNode {
             'childNodes': this.recursiveNodeCrawl(this),
             'childBranches': this.childBranches
         })
+    }
+
+    /**
+     * Chunk string into sentences, removing unwanted
+     * sentences from the pool and adding to local registry.
+     * @param sentence 
+     */
+    public parseSentences(body: string): string[] {
+        let sentences;
+
+        // chunk big string into it's sentences
+        sentences = chunkSentences(body);
+
+        // remove typed sentences
+        sentences = removeTypedSentenceDuplicates(sentences);
+
+        // other stuff?
+        return sentences
+    }
+
+    /**
+     * Process a a sentence into it's respective branches, modifying existing ones
+     * as necessary.
+     * @param body a sentence string.
+     */
+    public tree(sentences: string[]): void {
+        for (const sentence of sentences) {
+            const words = sentence.split(' ');
+    
+            let curNode: FPNode = this;
+    
+            for (const word of words) {
+                curNode = curNode.addNewChildNode(word)
+                curNode.visits += 1
+            }
+        }
+    }
+
+    /**
+     * Display hierarchy starting with a Node of param word, at a given level.
+     * Default level is ROOT level.
+     * @param word 
+     * @param level 
+     */
+    public getNode(word: string, /* level = 0 */): void {
+        for (const child of this.childNodes) {
+            child.nodeWord === word && child.getAllProps(child, false);
+        }
+    }
+
+    /**
+     * Display hierarchy starting at the Root Node, spanning all branches to their endpoints.
+     * --WARNING: may throw recursion errors if you have large amounts of data!
+     * @param level 
+     */
+    public logHierarchy(level = 1): void {
+        level === 1 && console.log('***** ROOT LEVEL *****');
+
+        for (const child of this.childNodes) {
+            // console log nodes
+            level === 1 && console.log(`***** START BRANCH: ${child.nodeWord} *****\n`);
+            console.log('+' + '-'.repeat(level * 2 - 2), child.nodeWord, '( visits:', child.visits, ')');
+
+            // Recursive function call for all children
+            child.logHierarchy(level + 1);
+        }
     }
 }
 

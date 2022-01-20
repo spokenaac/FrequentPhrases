@@ -1,4 +1,4 @@
-import FPNode from "./utils/FPNode";
+import FPNode from "./utils/FPNode/FPNode";
 import { FPNodeProps, Format } from "./utils/interfaces";
 
 /**
@@ -9,10 +9,14 @@ import { FPNodeProps, Format } from "./utils/interfaces";
  * frequently throughout the given data, modified by optionally provided params.
  */
 class FrequentPhrase {
-    registry?: boolean
-    rootNode: FPNode
-    constructor() {
-        this.registry = false;
+    boo: boolean;
+    limit: number;
+    sentenceRegistry: string[];
+    rootNode: FPNode;
+    constructor(sentenceLimit = 500) {
+        this.boo = false;
+        this.sentenceRegistry = [];
+        this.limit = sentenceLimit;
         this.rootNode = this.instantiateRootNode();
     }
 
@@ -20,7 +24,7 @@ class FrequentPhrase {
      * Instantiate root node either from existing data or from scratch
      */
     private instantiateRootNode(): FPNode {
-        if (this.registry) {
+        if (this.boo) {
             // some storage stuff, check for existing data
             return new FPNode('ignore this, check for storage');
         } else {
@@ -28,25 +32,43 @@ class FrequentPhrase {
         }
     }
 
+    get registry() {
+        return this.sentenceRegistry;
+    }
+
+    set registry(val: string[]) {
+        this.sentenceRegistry.push(...val);
+    }
+
+    get root() {
+        return this.rootNode;
+    }
+
+    set root(val: FPNode) {
+        this.rootNode = val;
+    }
+
+    /**
+     * Cleans out the sentence registry and destroys the node tree
+     */
+    public clearData() {
+        this.registry = [];
+        this.root = new FPNode('ROOT');
+    }
+
     /**
      * Process a string of sentences. Frequent phrases can only
      * be extracted from processed text.
-     * @param body 
+     * @param body
+     * @returns [registry, rootNode]
      */
-    public async process(body: string): Promise<void> {
-        // Regex to split body of text into it's respective sentences, including punctuation, quotes
-        let sentences = body.replace(/(\.+|:|!|\?)("*|'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|");
+    public async process(body: string): Promise<(string[] | FPNode)[]> {
+        this.registry = this.rootNode.parseSentences(body);
+        const root = this.root;
 
-        // Remove " and ' from text
-        // Don't return any sentences that are None, blank strings. Also remove whitespace.
-        sentences = sentences.map(x => x.replace(/["',.?!]/g, '').trim());
+        root.tree(this.sentenceRegistry);
 
-        for (const sentence of sentences) {
-            this.rootNode.tree(sentence);
-            this.rootNode;
-        }
-
-        return
+        return [this.sentenceRegistry, this.rootNode];
     }
 
     /**
