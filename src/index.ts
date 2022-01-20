@@ -1,4 +1,5 @@
 import FPNode from "./utils/FPNode";
+import { FPNodeProps, Format } from "./utils/interfaces";
 
 /**
  * Used to parse large swathes of sentence data and output
@@ -8,25 +9,33 @@ import FPNode from "./utils/FPNode";
  * frequently throughout the given data, modified by optionally provided params.
  */
 class FrequentPhrase {
-    registry?: { tree: string[] }
+    registry?: boolean
     rootNode: FPNode
     constructor() {
-        this.registry = undefined;
+        this.registry = false;
         this.rootNode = this.instantiateRootNode();
     }
 
+    /**
+     * Instantiate root node either from existing data or from scratch
+     */
     private instantiateRootNode(): FPNode {
-        if (false) {
+        if (this.registry) {
             // some storage stuff, check for existing data
+            return new FPNode('ignore this, check for storage');
         } else {
-            // We don't have any node data yet, instantiate
-            return new FPNode('ROOT');
+        return new FPNode('ROOT');
         }
     }
 
-    process(body: string): void {
+    /**
+     * Process a string of sentences. Frequent phrases can only
+     * be extracted from processed text.
+     * @param body 
+     */
+    public async process(body: string): Promise<void> {
         // Regex to split body of text into it's respective sentences, including punctuation, quotes
-        let sentences = body.replace(/(\.+|\:|\!|\?)(\"*|\'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|");
+        let sentences = body.replace(/(\.+|:|!|\?)("*|'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|");
 
         // Remove " and ' from text
         // Don't return any sentences that are None, blank strings. Also remove whitespace.
@@ -36,6 +45,19 @@ class FrequentPhrase {
             this.rootNode.tree(sentence);
             this.rootNode;
         }
+
+        return
+    }
+
+    /**
+     * Export current FPNode tree data in JSONifiable format.
+     * Can be a JSON stringified string or an object.
+     * @param format must be either 'string' or 'object'
+     */
+    public exportData(format: Format): FPNodeProps | string | Error {
+        if (format == Format.Object) return this.rootNode.exportObj();
+        if (format == Format.String) return this.rootNode.exportStr();
+        return Error('Format param must be either "string" or "object"');
     }
 }
 

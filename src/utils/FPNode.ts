@@ -1,17 +1,21 @@
+import { FPNodeProps } from './interfaces';
+
 /**
  * Generic Node for creating the word tree hierarchies.
  * Has methods for 
  */
 class FPNode {
+    visits: number;
     nodeWord: string
     childNodes: FPNode[];
     parentNodes: FPNode[];
-    visits: number;
+    childBranches: number;
     constructor(word: string) {
-        this.visits = 0
-        this.nodeWord = word
-        this.childNodes = []
-        this.parentNodes = []
+        this.visits = 0;
+        this.nodeWord = word;
+        this.childNodes = [];
+        this.parentNodes = [];
+        this.childBranches = this.childNodes.length;
     }
 
     /**
@@ -34,7 +38,7 @@ class FPNode {
             // There already are children in this FPNode
             // add the new Node to the current Node's children
             // and the current Node to the child Node's parents
-            this.childNodes.push(newChild);
+            this.childBranches = this.childNodes.push(newChild);
             newChild.parentNodes.push(this);
             return newChild;
         }
@@ -58,11 +62,33 @@ class FPNode {
     /**
      * Prints all properties of the node.
      */
-    private getAllProps(): void {
-        console.log('word: ', this.nodeWord);
-        console.log('parents: ', this.parentNodes.filter((parent) => parent.nodeWord));
-        console.log('children: ', this.childNodes.filter((child) => `${child.nodeWord} + ${child.visits}`));
-        console.log('visits: ', this.visits);
+    private getAllProps(node?: FPNode): void {
+        const curNode = node || this;
+
+        console.log('word: ', curNode.nodeWord);
+        console.log('visits: ', curNode.visits);
+        console.log('parents: ', curNode.parentNodes.filter((parent) => parent.nodeWord));
+        console.log('children: ', curNode.childNodes.filter((child) => `${child.nodeWord} + ${child.visits}`));
+    }
+
+    /**
+     * Recursively crawls through the FPNode directory, starting at the top
+     * ROOT node.
+     * @param node
+     */
+    private recursiveNodeCrawl(node: FPNode): FPNodeProps[] {
+        const props: FPNodeProps[] = [];
+
+        for (const child of node.childNodes) {
+            props.push({
+                'nodeWord': child.nodeWord,
+                'visits': child.visits,
+                'childNodes': this.recursiveNodeCrawl(child),
+                'childBranches': child.childBranches
+            })
+        }
+
+        return props;
     }
 
     /**
@@ -82,25 +108,6 @@ class FPNode {
     }
 
     /**
-     * Display hierarchy starting at the Root Node, spanning all branches to their endpoints.
-     * --WARNING: may throw recursion errors if you have large amounts of data!
-     * @param level 
-     */
-    public getHierarchy(level = 1): void {
-        level === 1 && console.log('***** ROOT LEVEL *****');
-
-        for (const child of this.childNodes) {
-            // Special print for second-layer nodes
-            level === 1 && console.log(`***** START BRANCH: ${child.nodeWord} *****\n`);
-
-            console.log('+' + '-'.repeat(level * 2), child.nodeWord, '( visits:', child.visits, ')');
-
-            // Recursive function call for all children
-            child.getHierarchy(level + 1);
-        }
-    }
-
-    /**
      * Display hierarchy starting with a Node of param word, at a given level.
      * Default level is ROOT level.
      * @param word 
@@ -110,6 +117,52 @@ class FPNode {
         for (const child of this.childNodes) {
             child.nodeWord === word && child.getAllProps()
         }
+    }
+
+    /**
+     * Display hierarchy starting at the Root Node, spanning all branches to their endpoints.
+     * --WARNING: may throw recursion errors if you have large amounts of data!
+     * @param level 
+     */
+    public getHierarchy(level = 1): void {
+        level === 1 && console.log('***** ROOT LEVEL *****');
+
+        for (const child of this.childNodes) {
+            // console log nodes
+            level === 1 && console.log(`***** START BRANCH: ${child.nodeWord} *****\n`);
+            console.log('+' + '-'.repeat(level * 2 - 2), child.nodeWord, '( visits:', child.visits, ')');
+
+            // Recursive function call for all children
+            child.getHierarchy(level + 1);
+        }
+    }
+
+    /**
+     * Recursively runs through all branches,
+     * exporting data in an object (JSONifiable format).
+     */
+    public exportObj(): FPNodeProps {
+        const result: FPNodeProps = {
+            'nodeWord': this.nodeWord,
+            'visits': this.visits,
+            'childNodes': this.recursiveNodeCrawl(this),
+            'childBranches': this.childBranches
+        }
+
+        return result
+    }
+
+    /**
+     * Recursively runs through all branches,
+     * exporting data as a string (JSONifiable format).
+     */
+    public exportStr(): string {
+        return JSON.stringify({
+            'nodeWord': this.nodeWord,
+            'visits': this.visits,
+            'childNodes': this.recursiveNodeCrawl(this),
+            'childBranches': this.childBranches
+        })
     }
 }
 
