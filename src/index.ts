@@ -1,5 +1,5 @@
 import FPNode from "./utils/FPNode/FPNode";
-import { FPNodeProps, Format } from "./utils/interfaces";
+import { FPNodeProps } from "./utils/interfaces";
 
 /**
  * Used to parse large swathes of sentence data and output
@@ -11,25 +11,13 @@ import { FPNodeProps, Format } from "./utils/interfaces";
 class FrequentPhrase {
     boo: boolean;
     limit: number;
-    sentenceRegistry: string[];
     rootNode: FPNode;
+    sentenceRegistry: string[];
     constructor(sentenceLimit = 500) {
         this.boo = false;
-        this.sentenceRegistry = [];
         this.limit = sentenceLimit;
         this.rootNode = this.instantiateRootNode();
-    }
-
-    /**
-     * Instantiate root node either from existing data or from scratch
-     */
-    private instantiateRootNode(): FPNode {
-        if (this.boo) {
-            // some storage stuff, check for existing data
-            return new FPNode('ignore this, check for storage');
-        } else {
-        return new FPNode('ROOT');
-        }
+        this.sentenceRegistry = [];
     }
 
     get registry() {
@@ -49,11 +37,23 @@ class FrequentPhrase {
     }
 
     /**
-     * Cleans out the sentence registry and destroys the node tree
+     * Instantiate root node either from existing data or from scratch
      */
-    public clearData() {
-        this.registry = [];
-        this.root = new FPNode('ROOT');
+    private instantiateRootNode(): FPNode {
+        if (this.boo) {
+            // some storage stuff, check for existing data
+            return new FPNode('ignore this, check for storage');
+        } else {
+        return new FPNode('ROOT');
+        }
+    }
+
+    public async scoreTree(): Promise<void> {
+        await this.exportObj().then((res) => {
+            this.root.candidateSelection('simpleDropOff', this.root, '').then((candidates) => {
+                console.log(candidates);
+            })
+        })
     }
 
     /**
@@ -63,23 +63,34 @@ class FrequentPhrase {
      * @returns [registry, rootNode]
      */
     public async process(body: string): Promise<(string[] | FPNode)[]> {
-        this.registry = this.rootNode.parseSentences(body);
-        const root = this.root;
+        this.registry = this.root.parseSentences(body);
+        this.root.tree(this.registry);
 
-        root.tree(this.sentenceRegistry);
-
-        return [this.sentenceRegistry, this.rootNode];
+        return [this.registry, this.root];
     }
 
     /**
-     * Export current FPNode tree data in JSONifiable format.
-     * Can be a JSON stringified string or an object.
-     * @param format must be either 'string' or 'object'
+     * Export current FPNode tree data in JSONifiable format (object).
      */
-    public exportData(format: Format): FPNodeProps | string | Error {
-        if (format == Format.Object) return this.rootNode.exportObj();
-        if (format == Format.String) return this.rootNode.exportStr();
-        return Error('Format param must be either "string" or "object"');
+    public async exportObj(): Promise<FPNodeProps> {
+        return this.root.exportObj();
+    }
+
+    /**
+     * Export current FPNode tree data in JSONifiable format (string).
+     */
+    public async exportStr(): Promise<string> {
+        return this.root.exportStr();
+    }
+
+    /**
+     * Cleans out the sentence registry and destroys the node tree
+     */
+    public async clearData(): Promise<(string[] | FPNode)[]> {
+        this.registry = [];
+        this.root = new FPNode('ROOT');
+
+        return [this.registry, this.root];
     }
 }
 

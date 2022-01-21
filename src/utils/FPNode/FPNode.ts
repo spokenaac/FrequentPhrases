@@ -1,3 +1,4 @@
+import FPNodeScorer from './FPNodeScorer';
 import { FPNodeProps } from '../interfaces';
 import { removeTypedSentenceDuplicates, chunkSentences } from '../helpers';
 
@@ -5,13 +6,14 @@ import { removeTypedSentenceDuplicates, chunkSentences } from '../helpers';
  * Generic Node for creating the word tree hierarchies.
  * Has methods for 
  */
-class FPNode {
+class FPNode extends FPNodeScorer {
     visits: number;
     nodeWord: string;
     childNodes: FPNode[];
     parentNodes: FPNode[];
     childBranches: number;
     constructor(word: string) {
+        super();
         this.visits = 0;
         this.nodeWord = word;
         this.childNodes = [];

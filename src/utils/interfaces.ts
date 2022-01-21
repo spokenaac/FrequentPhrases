@@ -21,7 +21,13 @@ export interface ParseConfig {
     removeTypedSentences: boolean;
 }
 
-export enum Format {
-    String = 'string',
-    Object = 'object'
+export interface UnlinkedCandidates {
+    w: string,
+    v: number,
+    c: number
+}
+
+export interface LinkedCandidates {
+    w: string,
+    v: number
 }
