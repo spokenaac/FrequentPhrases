@@ -1,12 +1,6 @@
 /**
  * Excludes parent property to avoid recursive outputs (parent nodes are implied
  * via object structure).
- * 
- * @property {number} visits
- * @property {string} nodeWord
- * @property {number} childBranches
- * @property {FPNodeProps[]} childNodes
- * @property {FPNodeProps[]} parentNodes *Optional*
  */
 export interface FPNodeProps {
     visits: number,
@@ -16,18 +10,40 @@ export interface FPNodeProps {
     parentNodes?: FPNodeProps[]
 }
 
-export interface ParseConfig {
+export interface Config {
+    selectionAlgorithm: string;
+    scoringAlgorithm: string;
+    maxPhraseLength: number;
+    preProcessingSteps: PreProcessConfig
+}
+
+export interface PreProcessConfig {
+    trim: number
+}
+
+export interface PostProcessConfig {
+    uniqueWordAtCutoffDepth: string | number
+}
+
+export interface ParserConfig {
     chunkSentences: boolean;
     removeTypedSentences: boolean;
 }
 
-export interface UnlinkedCandidates {
-    w: string,
-    v: number,
-    c: number
+export interface Candidates {
+    c: number,
+    word: string,
+    visits: number,
+    branches: number
 }
 
-export interface LinkedCandidates {
-    w: string,
-    v: number
+export interface CandidatesSelectionResult {
+    phrase: string,
+    visits: number[],
+    childBranches: number[]
+}
+
+export interface ScoredCandidates {
+    phrase: string,
+    score: number
 }

@@ -1,5 +1,5 @@
 import FPNode from "./utils/FPNode/FPNode";
-import { FPNodeProps } from "./utils/interfaces";
+import { Config, FPNodeProps } from "./utils/interfaces";
 
 /**
  * Used to parse large swathes of sentence data and output
@@ -13,11 +13,20 @@ class FrequentPhrase {
     limit: number;
     rootNode: FPNode;
     sentenceRegistry: string[];
+    config: Config;
     constructor(sentenceLimit = 500) {
         this.boo = false;
         this.limit = sentenceLimit;
         this.rootNode = this.instantiateRootNode();
         this.sentenceRegistry = [];
+        this.config = {
+            selectionAlgorithm: 'dropOff',
+            scoringAlgorithm: 'unique',
+            maxPhraseLength: 6,
+            preProcessingSteps: {
+                trim: 3
+            }
+        }
     }
 
     get registry() {
@@ -49,11 +58,9 @@ class FrequentPhrase {
     }
 
     public async scoreTree(): Promise<void> {
-        await this.exportObj().then((res) => {
-            this.root.candidateSelection('simpleDropOff', this.root, '').then((candidates) => {
-                console.log(candidates);
-            })
-        })
+        const phrases = this.root.getFrequentPhrases(this.root, this.config);
+
+        console.log('hi there: ', phrases);
     }
 
     /**
