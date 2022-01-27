@@ -1,5 +1,7 @@
-import FPNode from "./utils/FPNode/FPNode";
-import { Config, FPNodeProps } from "./utils/interfaces";
+import FPNode from "./utils/FPNode";
+import Parser from "./utils/Parser";
+import defaultConfig from "./utils/config";
+import { Config, FP, ScoredCandidates } from "./utils/fptypes";
 
 /**
  * Used to parse large swathes of sentence data and output
@@ -11,93 +13,79 @@ import { Config, FPNodeProps } from "./utils/interfaces";
 class FrequentPhrase {
     boo: boolean;
     limit: number;
+    config: Config;
+    parser: Parser;
     rootNode: FPNode;
     sentenceRegistry: string[];
-    config: Config;
-    constructor(sentenceLimit = 500) {
+
+    constructor(sentenceLimit = 500, config = defaultConfig) {
         this.boo = false;
         this.limit = sentenceLimit;
+        this.config = config
+        this.parser = new Parser(this.config.parserConfig);
         this.rootNode = this.instantiateRootNode();
         this.sentenceRegistry = [];
-        this.config = {
-            selectionAlgorithm: 'dropOff',
-            scoringAlgorithm: 'unique',
-            maxPhraseLength: 6,
-            preProcessingSteps: {
-                trim: 3
-            }
-        }
-    }
-
-    get registry() {
-        return this.sentenceRegistry;
-    }
-
-    set registry(val: string[]) {
-        this.sentenceRegistry.push(...val);
-    }
-
-    get root() {
-        return this.rootNode;
-    }
-
-    set root(val: FPNode) {
-        this.rootNode = val;
     }
 
     /**
      * Instantiate root node either from existing data or from scratch
+     * @returns {FPNode} An FPNode form existing data, or a new node.
      */
     private instantiateRootNode(): FPNode {
         if (this.boo) {
             // some storage stuff, check for existing data
-            return new FPNode('ignore this, check for storage');
+            return new FPNode('ignore this, check for storage', this.config);
         } else {
-        return new FPNode('ROOT');
+            return new FPNode('ROOT', this.config);
         }
     }
 
-    public async scoreTree(): Promise<void> {
-        const phrases = this.root.getFrequentPhrases(this.root, this.config);
+    /**
+     * Return Frequent Phrases from data already processed.
+     * @returns {Promise<FP>} Frequent Phrases (Promise)
+     */
+    public async getFrequentPhrases(): Promise<FP> {
+        const start = performance.now();
 
-        console.log('hi there: ', phrases);
+        let phrases: ScoredCandidates[] = [];
+    
+        await this.rootNode.getFP(this.rootNode, this.config).then((results) => {
+            phrases = results;
+        });
+
+        return {
+            frequentPhrases: phrases,
+            executionTime: `${(performance.now() - start).toFixed(3)}ms`,
+            ok: true,
+            msg: ''
+        };
     }
 
     /**
      * Process a string of sentences. Frequent phrases can only
      * be extracted from processed text.
      * @param body
-     * @returns [registry, rootNode]
+     * @returns {Promise<string[] | FPNode[]>} [registry, rootNode]
      */
     public async process(body: string): Promise<(string[] | FPNode)[]> {
-        this.registry = this.root.parseSentences(body);
-        this.root.tree(this.registry);
+        // parse giant string into sentences
+        this.sentenceRegistry = this.parser.parseSentences(body);
 
-        return [this.registry, this.root];
-    }
+        // generate FPNode tree
+        this.rootNode.generateTree(this.sentenceRegistry);
 
-    /**
-     * Export current FPNode tree data in JSONifiable format (object).
-     */
-    public async exportObj(): Promise<FPNodeProps> {
-        return this.root.exportObj();
-    }
-
-    /**
-     * Export current FPNode tree data in JSONifiable format (string).
-     */
-    public async exportStr(): Promise<string> {
-        return this.root.exportStr();
+        return [this.sentenceRegistry, this.rootNode];
     }
 
     /**
      * Cleans out the sentence registry and destroys the node tree
+     * @returns {Promise<string[] | FPNode[]>} [registry, FPNode]
      */
-    public async clearData(): Promise<(string[] | FPNode)[]> {
-        this.registry = [];
-        this.root = new FPNode('ROOT');
+    public async reset(): Promise<(string[] | FPNode)[]> {
+        this.sentenceRegistry = [];
+        this.rootNode = new FPNode('ROOT', this.config);
 
-        return [this.registry, this.root];
+        return [this.sentenceRegistry, this.rootNode];
     }
 }
 

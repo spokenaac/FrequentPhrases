@@ -1,20 +1,23 @@
-/**
- * Excludes parent property to avoid recursive outputs (parent nodes are implied
- * via object structure).
- */
 export interface FPNodeProps {
     visits: number,
     nodeWord: string,
-    childBranches: number
+    childBranches: number,
     childNodes: FPNodeProps[],
     parentNodes?: FPNodeProps[]
 }
 
 export interface Config {
-    selectionAlgorithm: string;
-    scoringAlgorithm: string;
-    maxPhraseLength: number;
-    preProcessingSteps: PreProcessConfig
+    maxPhraseLength: number,
+    selectionAlgorithm: string,
+    scoringAlgorithm: string,
+    parserConfig: ParserConfig,
+    preProcessing: PreProcessConfig,
+    postProcessing: PostProcessConfig
+}
+
+export interface ParserConfig {
+    chunkSentences: boolean,
+    removeTypedSentences: boolean
 }
 
 export interface PreProcessConfig {
@@ -25,12 +28,7 @@ export interface PostProcessConfig {
     uniqueWordAtCutoffDepth: string | number
 }
 
-export interface ParserConfig {
-    chunkSentences: boolean;
-    removeTypedSentences: boolean;
-}
-
-export interface Candidates {
+export interface Candidate {
     c: number,
     word: string,
     visits: number,
@@ -46,4 +44,11 @@ export interface CandidatesSelectionResult {
 export interface ScoredCandidates {
     phrase: string,
     score: number
+}
+
+export interface FP {
+    frequentPhrases: ScoredCandidates[],
+    executionTime: string,
+    ok: boolean,
+    msg: string
 }
