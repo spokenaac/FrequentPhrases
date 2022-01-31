@@ -11,7 +11,7 @@ import { Config, FP, ScoredCandidates } from "./utils/fptypes";
  * frequently throughout the given data, modified by optionally provided params.
  */
 class FrequentPhrase {
-    boo: boolean;
+    existingData: boolean;
     limit: number;
     config: Config;
     parser: Parser;
@@ -19,7 +19,7 @@ class FrequentPhrase {
     sentenceRegistry: string[];
 
     constructor(sentenceLimit = 500, config = defaultConfig) {
-        this.boo = false;
+        this.existingData = false;
         this.limit = sentenceLimit;
         this.config = config
         this.parser = new Parser(this.config.parserConfig);
@@ -32,8 +32,8 @@ class FrequentPhrase {
      * @returns {FPNode} An FPNode form existing data, or a new node.
      */
     private instantiateRootNode(): FPNode {
-        if (this.boo) {
-            // some storage stuff, check for existing data
+        if (this.existingData) {
+            // some storage stuff when we figure it out, check for existing data
             return new FPNode('ignore this, check for storage', this.config);
         } else {
             return new FPNode('ROOT', this.config);
@@ -42,13 +42,21 @@ class FrequentPhrase {
 
     /**
      * Return Frequent Phrases from data already processed.
-     * @returns {Promise<FP>} Frequent Phrases (Promise)
+     * @param body OPTIONAL - string of text, if passed it will be processed and then phrases will be extracted. If not passed, phrases will be extracted from existing data.
+     * @returns {Promise<FP>} Frequent phrases present in the text
      */
-    public async getFrequentPhrases(): Promise<FP> {
+    public async getFrequentPhrases(body?: string): Promise<FP> {
+        // Performance monitoring
         const start = performance.now();
 
+        // If we received text, process it first
+        if (body) {
+            await this.process(body);
+        }
+
+        // Get our frequent phrases
         let phrases: ScoredCandidates[] = [];
-    
+
         await this.rootNode.getFP(this.rootNode, this.config).then((results) => {
             phrases = results;
         });
@@ -89,4 +97,7 @@ class FrequentPhrase {
     }
 }
 
-export default FrequentPhrase;
+export {
+    FrequentPhrase,
+    Parser
+};
