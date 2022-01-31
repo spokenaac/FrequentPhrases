@@ -2,7 +2,8 @@ import {
     Config,
     Candidate,
     FPNodeProps,
-    CandidatesSelectionResult
+    CandidatesSelectionResult,
+    SelectionConfig
 } from "../fptypes"
 import Parser from "../Parser";
 
@@ -13,11 +14,13 @@ class CandidateSelector {
     preProcessedCandidates: FPNodeProps[];
     config: Config;
     parser: Parser;
+    algorithmConfig: SelectionConfig;
 
     constructor(preProcessedCandidates: FPNodeProps[], config: Config) {
         this.preProcessedCandidates = preProcessedCandidates;
         this.config = config;
         this.parser = new Parser(config.parserConfig);
+        this.algorithmConfig = this.config.selectionConfig;
     }
 
     /**
@@ -32,7 +35,7 @@ class CandidateSelector {
      * @param threshold between 0 and 0.9
      * @returns {Candidate[]} An array of candidates
      */
-    private dropOffCandidateSelection(node: FPNodeProps, threshold = 0.33, counter = 1): Candidate[] {
+    private dropOffCandidateSelection(node: FPNodeProps, counter = 1): Candidate[] {
         // Recursively keep creating our Candidates array and populate with current node and children
         const props: Candidate[] = [];
         props.push({
@@ -44,9 +47,12 @@ class CandidateSelector {
 
         // Recursive bit
         for (const child of node.childNodes) {
-            if (child.visits / node.visits >= threshold) {
+            if (child.visits / node.visits >= this.algorithmConfig.dropOff.threshold) {
                 if (counter === this.config.maxPhraseLength) break;
-                props.push(...this.dropOffCandidateSelection(child, threshold, counter + 1));
+                props.push(...this.dropOffCandidateSelection(child, counter + 1));
+            }
+            else {
+                break;
             }
         }
         return props;

@@ -9,10 +9,17 @@ export interface FPNodeProps {
 export interface Config {
     maxPhraseLength: number,
     selectionAlgorithm: string,
+    selectionConfig: SelectionConfig,
     scoringAlgorithm: string,
     parserConfig: ParserConfig,
     preProcessing: PreProcessConfig,
     postProcessing: PostProcessConfig
+}
+
+export interface SelectionConfig {
+    dropOff: {
+        threshold: number
+    }
 }
 
 export interface ParserConfig {

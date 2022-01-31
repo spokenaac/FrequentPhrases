@@ -20,13 +20,19 @@ class CandidatePreProcessor {
     public process(): FPNodeProps[] {
         const candidates: FPNodeProps[] = [];
 
-        const trim = this.config.trim;
-
+        // Sort visits descending
         this.node.childNodes.sort((a, b) => b.visits - a.visits);
 
+        // if trim is 0, don't trim anything
+        const trim = this.config.trim === 0
+            ? this.node.childNodes.length
+            : this.config.trim
+
+        // push only the top 'trim' children
         for (let i = 0; i < trim; i += 1) {
             candidates.push(this.node.childNodes[i]);
         }
+        
         return candidates;
     }
 }

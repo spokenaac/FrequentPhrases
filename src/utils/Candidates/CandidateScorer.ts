@@ -39,15 +39,14 @@ class CandidateScorer {
      */
     private defaultScore(unscoredCandidates: CandidatesSelectionResult[]): ScoredCandidates[] {
         const scoredCandidates: ScoredCandidates[] = unscoredCandidates.map((candidate) => { 
-            const lengthWeight = candidate.phrase.length / 6;
-            const visitsWeight = candidate.visits.reduce((a, b) => a + b) / 18;
-            const branchesWeight = candidate.childBranches.reduce((a, b) => a + b) / 12;
+            const visitsWeight = candidate.visits.reduce((a, b) => a + b) / candidate.visits.length;
 
             return {
                 phrase: candidate.phrase,
-                score: lengthWeight * visitsWeight * branchesWeight
+                score: visitsWeight
             }
         })
+        
         return scoredCandidates;
     }
 
