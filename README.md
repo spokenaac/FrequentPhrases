@@ -20,7 +20,7 @@ The workflow is generally:
 const FP = new FrequentPhrase();
 ```
 
-## Custom Config
+## Custom Config (more info here)
 The default config object is as follows:
 ```javascript
 const defaultConfig = {
@@ -57,8 +57,32 @@ FP.config.maxPhraseLength = 8; // etc.
 ## Process Text And/Or Generate Phrases
 The last bit can be separated out, or done altogether.
 
-To just process text:
 ```javascript
-const text = '
-FP.process(text)
+const speech = 'Five score years ago, a great American, in whose symbolic shadow' // ... MLK's I Have A Dream speech
 ```
+
+To process text and then extract phrases:
+```javascript
+FP.process(speech);
+
+// then get Frequent Phrases
+await FP.getFrequentPhrases().then((res) => console.log(res))
+```
+
+To do both, just pass text in to `getFrequentPhrases()`. Note that this method overwrites previous tree data, and is best served if you are instantiating a `new FrequentPhrase()` everytime.
+```javascript
+await FP.getFrequentPhrases(speech).then((res) => console.log(res));
+```
+
+Both methods will yield the same result:
+```typescript
+// ^^^^^ console.log(res);
+{
+    ok: boolean
+    msg: string
+    frequentPhrases: ScoredCandidates[]
+    executionTime: string
+}
+```
+
+# Config
