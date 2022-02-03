@@ -127,16 +127,7 @@ Defines what scoring algorithm is used. Default algo is based solely on averaged
     * ...
     * 'How are you?'
 
-# Main Class
-
-## FrequentPhrase
-Used to parse large swathes of sentence data and output
-a word tree using a recursive node algorithm.
-
-This tree can be used to generate a number of phrases that appear
-frequently throughout the given data, modified by optionally provided params.
-
-Public methods:
+# More
 
 * [.getFrequentPhrases(body)](#FrequentPhrase+getFrequentPhrases)
 * [.process(body)](#FrequentPhrase+process)
@@ -155,7 +146,7 @@ Return Frequent Phrases from data already processed.
 
 ---
 
-### frequentPhrase.process(body)
+### FrequentPhrase.process(body)
 Process a string of sentences. Frequent phrases can only
 be extracted from processed text.
 
@@ -167,8 +158,7 @@ be extracted from processed text.
 
 ---
 
-### frequentPhrase.reset()
+### FrequentPhrase.reset()
 Cleans out the sentence registry and destroys the node tree
-
-(#FrequentPhrase)  
+  
 **Returns**: `Promise<string[] | FPNode[]>` - [registry, rootNode]
