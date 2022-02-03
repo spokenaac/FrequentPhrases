@@ -2,9 +2,11 @@ import { Candidate, CandidatesSelectionResult, ParserConfig } from "../fptypes";
 
 class Parser {
     config: ParserConfig;
+    s: string;
 
     constructor(config: ParserConfig) {
         this.config = config;
+        this.s = '\u00a7';
     }
 
     /**
@@ -13,6 +15,34 @@ class Parser {
      * @returns {string[]} Unique sentences
      */
     public removeTypedSentenceDuplicates(sentences: string[]): string[] {
+        
+        console.log(sentences.sort());
+
+        // remove \u00a7
+        const corpus: string[] = [];
+
+        for (const sentence of sentences) {
+            corpus.push(sentence.replace('\u00a7 ', ''))
+        }
+
+        // sort on string length descending so as to remove as many
+        // repeats as possible
+        corpus.sort((a, b) => b.length - a.length);
+
+        for (const sentence of corpus) {
+            let accum = '';
+
+            for (const letter of sentence) {
+                accum += letter;
+
+                if (corpus.indexOf(accum) !== -1 && sentence.length !== accum.length) {
+                    corpus.splice(corpus.indexOf(accum), 1);
+                }
+            }
+        }
+
+        console.log(corpus.sort());
+
         return sentences;
     }
     
@@ -57,13 +87,17 @@ class Parser {
      * @returns {string[]} Parsed text based on config
      */
     public parseSentences(body: string): string[] {
-        let sentences;
+        let sentences: string[] = [];
 
         // chunk big string into it's sentences
-        sentences = this.chunkSentences(body);
+        if (this.config.chunkSentences) {
+            sentences = this.chunkSentences(body);
+        }
 
         // remove typed sentences
-        sentences = this.removeTypedSentenceDuplicates(sentences);
+        if (this.config.removeTypedSentences) {
+            sentences = this.removeTypedSentenceDuplicates(sentences);
+        }
 
         // other stuff?
         return sentences

@@ -11,7 +11,7 @@ const defaultConfig: Config = {
     scoringAlgorithm: 'default',
     parserConfig: {
         chunkSentences: true,
-        removeTypedSentences: true   
+        removeTypedSentences: false   
     },
     preProcessing: {
         trim: 0
