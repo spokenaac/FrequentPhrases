@@ -25,10 +25,12 @@ class Parser {
             corpus.push(sentence.replace('\u00a7 ', ''))
         }
 
-        // sort on string length descending so as to remove as many
-        // repeats as possible
+        // sort on string length descending
         corpus.sort((a, b) => b.length - a.length);
 
+        // iterate through each sentence, then iterate through each letter
+        // in that sentence. Check if the partial sentence exists in the corpus
+        // and if it does, remove it
         for (const sentence of corpus) {
             let accum = '';
 
@@ -40,6 +42,9 @@ class Parser {
                 }
             }
         }
+
+        // there are still typos, we need to remove them:
+        // 'hey how are you
 
         console.log(corpus.sort());
 
