@@ -23,7 +23,7 @@ The workflow is generally:
 const FP = new FrequentPhrase();
 ```
 
-## Custom Config (more info [HERE](#Config))
+## Custom Config (more info [HERE](#config))
 The default config object is as follows:
 ```javascript
 const defaultConfig = {
@@ -93,5 +93,35 @@ Both methods will yield the same result:
 }
 ```
 
+# Modifying the Library
+To help understanding of best ways to modify for a specific use-case, the library works as follows:
+1. Input corpus
+2. Pre-process potential candidates
+3. Select Candidates
+4. Score selected Candidates
+5. Post-process candidates
+6. Output
+
 # Config
-test
+## Pre-Processing
+* trim - Trims candidate pool to only originate from the top `trim` starter words. Trim defaults to `0`, or no trim.
+
+## Candidate Selection
+* Selection Algorithm - Algorithm to use for selection algorithm. Default is a simple dropoff, which cuts off phrases based on their relative visits between child / parent.
+* Selection Config - Stores constants to modify how selection algorithms perform. See [here]().
+
+## Candidate Scoring:
+Defines what scoring algorithm is used. Default algo is based solely on averaged visits, meaning a higher visit average yields higher scores.
+
+## Post-Processing
+* uniqueWordAtCutoffDepth - Trims scored candidates so that the highest-scored phrase from each starter word is represented.
+
+## Parser Config
+* chunkSentences - convert a string into an array of it's contained sentences
+* removeTypedSentences - find the unique, longest sentence amongst a gamut of typed copies of the same sentence.
+  * e.g.: We are only interested in the sentence 'How are you?' but we have:
+    * 'H'
+    * 'Ho'
+    * 'How'
+    * ...
+    * 'How are you?'
