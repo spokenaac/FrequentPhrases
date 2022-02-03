@@ -66,7 +66,7 @@ const speech = 'Five score years ago, a great American, in whose symbolic shadow
 
 To process text and then extract phrases:
 ```javascript
-FP.process(speech);
+await FP.process(speech);
 
 // then get Frequent Phrases
 await FP.getFrequentPhrases().then((res) => console.log(res))
