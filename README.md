@@ -170,5 +170,5 @@ be extracted from processed text.
 ### frequentPhrase.reset()
 Cleans out the sentence registry and destroys the node tree
 
-**Kind**: instance method of [<code>FrequentPhrase</code>](#FrequentPhrase)  
-**Returns**: <code>Promise.&lt;(Array.&lt;string&gt;\|Array.&lt;FPNode&gt;)&gt;</code> - [registry, FPNode]
+(#FrequentPhrase)  
+**Returns**: `Promise<string[] | FPNode[]>` - [registry, rootNode]
