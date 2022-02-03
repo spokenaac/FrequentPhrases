@@ -10,7 +10,7 @@ To install:
 npm install frequent-phrases
 ```
 
-# Usage
+# Basic Usage
 The workflow is generally:
 
 1. Construct FrequentPhrase instance
@@ -92,6 +92,7 @@ Both methods will yield the same result:
     executionTime: '3.544ms'
 }
 ```
+## [***For More](#more)
 
 # Modifying the Library
 To help understanding of best ways to modify for a specific use-case, the library works as follows:
@@ -125,3 +126,49 @@ Defines what scoring algorithm is used. Default algo is based solely on averaged
     * 'How'
     * ...
     * 'How are you?'
+
+# Main Class
+
+## FrequentPhrase
+Used to parse large swathes of sentence data and output
+a word tree using a recursive node algorithm.
+
+This tree can be used to generate a number of phrases that appear
+frequently throughout the given data, modified by optionally provided params.
+
+Public methods:
+
+* [.getFrequentPhrases(body)](#FrequentPhrase+getFrequentPhrases)
+* [.process(body)](#FrequentPhrase+process)
+* [.reset()](#FrequentPhrase+reset)
+
+---
+
+### FrequentPhrase.getFrequentPhrases(body)
+Return Frequent Phrases from data already processed.
+
+**Returns**: <code>Promise.&lt;FP&gt;</code> - Frequent phrases present in the text  
+
+| Param | Description |
+| --- | --- |
+| body | OPTIONAL - string of text, if passed it will be processed and then phrases will be extracted. If not passed, phrases will be extracted from existing data. |
+
+---
+
+### frequentPhrase.process(body)
+Process a string of sentences. Frequent phrases can only
+be extracted from processed text.
+
+**Returns**: `Promise<string[] | FPNode[]>` - [registry, rootNode]  
+
+| Param | Description |
+| --- | --- |
+| body | string of text, if passed it will be processed and then phrases will be extracted. If not passed, phrases will be extracted from existing data. |
+
+---
+
+### frequentPhrase.reset()
+Cleans out the sentence registry and destroys the node tree
+
+**Kind**: instance method of [<code>FrequentPhrase</code>](#FrequentPhrase)  
+**Returns**: <code>Promise.&lt;(Array.&lt;string&gt;\|Array.&lt;FPNode&gt;)&gt;</code> - [registry, FPNode]
