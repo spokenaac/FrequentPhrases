@@ -23,7 +23,7 @@ The workflow is generally:
 const FP = new FrequentPhrase();
 ```
 
-## Custom Config (more info here)
+## Custom Config (more info [HERE](#Config))
 The default config object is as follows:
 ```javascript
 const defaultConfig = {
@@ -78,14 +78,20 @@ await FP.getFrequentPhrases(speech).then((res) => console.log(res));
 ```
 
 Both methods will yield the same result:
-```typescript
+```javascript
 // ^^^^^ console.log(res);
 {
-    ok: boolean
-    msg: string
-    frequentPhrases: ScoredCandidates[]
-    executionTime: string
+    ok: true
+    msg: ''
+    frequentPhrases: [
+        { phrase: "", score: 0 },
+        { phrase: "", score: 0 },
+        { phrase: "", score: 0 },
+        ...
+    ]
+    executionTime: '3.544ms'
 }
 ```
 
 # Config
+test
