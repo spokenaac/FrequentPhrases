@@ -5,7 +5,7 @@ const defaultConfig: Config = {
     selectionAlgorithm: 'dropOff',
     selectionConfig: {
         dropOff: {
-            threshold: 0.5
+            threshold: 0.8
         }
     },
     scoringAlgorithm: 'default',
@@ -17,7 +17,8 @@ const defaultConfig: Config = {
         trim: 0
     },
     postProcessing: {
-        uniqueWordAtCutoffDepth: 1
+        uniqueWordAtCutoffDepth: 1,
+        removeSingleWordPhrases: true,
     }
 }
 

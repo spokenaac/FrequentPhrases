@@ -9,13 +9,25 @@ class CandidatePostProcessor {
         this.config = config;
     }
 
+    private removeSingleWordPhrases(candidates: ScoredCandidates[]): ScoredCandidates[] {
+        const filtered: ScoredCandidates[] = [];
+
+        candidates.forEach((candidate) => {
+            if (candidate.phrase.split(' ').length > 1) {
+                filtered.push(candidate);
+            }
+        })
+    
+        return filtered
+    }
+
     /**
      * Prepare candidates for output. Steps are:
      * @param scoredCandidates 
      * @param steps 
      */
     public process(): ScoredCandidates[] {
-        const postProcessedCandidates: ScoredCandidates[] = [];
+        let postProcessedCandidates: ScoredCandidates[] = [];
         
         // unfinished, would find commonalities in unique starting word phrases
         // if (steps.uniqueWordAtCutoffDepth === 'auto') {
@@ -36,6 +48,10 @@ class CandidatePostProcessor {
                     postProcessedCandidates.push(foundWord);
                 }
             }
+        }
+
+        if (this.config.removeSingleWordPhrases) {
+            postProcessedCandidates = this.removeSingleWordPhrases(postProcessedCandidates);
         }
         
         return postProcessedCandidates;

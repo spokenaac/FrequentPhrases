@@ -32,7 +32,8 @@ export interface PreProcessConfig {
 }
 
 export interface PostProcessConfig {
-    uniqueWordAtCutoffDepth: string | number
+    uniqueWordAtCutoffDepth: string | number,
+    removeSingleWordPhrases: boolean
 }
 
 export interface Candidate {

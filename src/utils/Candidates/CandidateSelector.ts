@@ -13,13 +13,11 @@ import Parser from "../Parser";
 class CandidateSelector {
     preProcessedCandidates: FPNodeProps[];
     config: Config;
-    parser: Parser;
     algorithmConfig: SelectionConfig;
 
     constructor(preProcessedCandidates: FPNodeProps[], config: Config) {
         this.preProcessedCandidates = preProcessedCandidates;
         this.config = config;
-        this.parser = new Parser(config.parserConfig);
         this.algorithmConfig = this.config.selectionConfig;
     }
 
@@ -51,9 +49,6 @@ class CandidateSelector {
                 if (counter === this.config.maxPhraseLength) break;
                 props.push(...this.dropOffCandidateSelection(child, counter + 1));
             }
-            else {
-                break;
-            }
         }
         return props;
     }
@@ -68,6 +63,7 @@ class CandidateSelector {
     public candidateSelection(): CandidatesSelectionResult[] {
         // Instantiate our candidates array that will be fed to our scoring algorithms
         const unlinkedCandidates: Candidate[] = [];
+        const parser = new Parser(this.config.parserConfig);
 
         // drop off algorithm
         if (this.config.selectionAlgorithm === 'dropOff') {
@@ -77,7 +73,7 @@ class CandidateSelector {
         }
 
         // We've selected our candidates, parse and return them
-        return this.parser.parseCandidates(unlinkedCandidates);
+        return parser.parseCandidates(unlinkedCandidates);
     }
 }
 
