@@ -17,9 +17,10 @@
     "url": "git+https://github.com/spokenaac/FrequentPhrases.git"
   },
   "keywords": [
-    "boilerplate",
-    "typescript",
-    "npm package boilerplate"
+    "frequent-phrases",
+    "phrases",
+    "frequent",
+    "nlp"
   ],
   "author": "Andrew Lyons",
   "license": "MIT",
