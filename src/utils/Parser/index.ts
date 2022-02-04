@@ -101,7 +101,7 @@ class Parser {
 
         }
 
-        return corpus.sort();
+        return corpus;
     }
     
     /**
