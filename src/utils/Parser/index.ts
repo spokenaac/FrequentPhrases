@@ -10,17 +10,29 @@ class Parser {
     }
 
     /**
+     * Compares two strings and returns a percentage match.
+     * @param string The first string
+     * @param substring the substring or second string to compare to the first
+     */
+    public stringCompare(string: string, substring: string): number {
+        let counter = 0;
+
+        for (let i = 0; i < substring.length; i += 1) {
+            counter += substring[i] === string[i] ? 1 : 0
+        }
+
+        return counter / substring.length
+    }
+
+    /**
      * Catch typed sentences and return the longest, last true copy of a typed sentence
      * @param sentences
      * @returns {string[]} Unique sentences
      */
     public removeTypedSentenceDuplicates(sentences: string[]): string[] {
-        
-        console.log(sentences.sort());
-
-        // remove \u00a7
         const corpus: string[] = [];
-
+        
+        // remove \u00a7
         for (const sentence of sentences) {
             corpus.push(sentence.replace('\u00a7 ', ''))
         }
@@ -43,12 +55,53 @@ class Parser {
             }
         }
 
-        // there are still typos, we need to remove them:
-        // 'hey how are you
+        // there are still typos, we need to remove them
+        // no 'correctness' algorithm is implemented yet, so for now just
+        // favor the longer string as 'correct' when comparing
+        for (const sentence of corpus) {
+            // make a copy of our corpus
+            const newCorpus = [...corpus];
 
-        console.log(corpus.sort());
+            // remove our current iteration from the new corpus so that we
+            // can compare all the other entries against it
+            newCorpus.splice(newCorpus.indexOf(sentence), 1);
 
-        return sentences;
+            // make a unique set of all duplicates
+            const dupes: string[] = [];
+            dupes.push(sentence);
+            
+            // scan sentence-removed new corpus for duplicates
+            for (const potentialDupe of newCorpus) {
+                // compare string vs substring
+                const ratio = this.stringCompare(sentence, potentialDupe);
+
+                if (ratio >= 0.8) {
+                    // we found a match, splice the match out and add to dupes set
+                    dupes.push(newCorpus.splice(newCorpus.indexOf(potentialDupe), 1)[0]);
+                }
+            }
+
+            // we now have a dupes set. If there's more than one entry (there's duplicates)
+            // then remove them all from the original corpus except for the longest one
+            //
+            // ***TODO  add a 'correctness' algorithm to perform true fuzzy string matching,
+            //          as it stands this is half of the fuzzy matching solution
+            if (dupes.length > 1) {
+                // get the longest string in the dupes array
+                const longest = dupes.reduce((a, b) => a.length > b.length ? a : b);
+
+                // remove it from the array
+                dupes.splice(dupes.indexOf(longest), 1);
+
+                for (const removable of dupes) {
+                    // remove all the remaining duplicates from the corpus
+                    corpus.splice(corpus.indexOf(removable), 1);
+                }
+            }
+
+        }
+
+        return corpus.sort();
     }
     
     /**

@@ -1,6 +1,6 @@
 {
   "name": "frequent-phrases",
-  "version": "0.1-alpha",
+  "version": "v0.1.0-alpha",
   "description": "Parse large swathes of sentence data and output frequent phrases.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
